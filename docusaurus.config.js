@@ -7,7 +7,7 @@
 import {themes as prismThemes} from 'prism-react-renderer';
 
 const organizationName = "b-tin";
-const projectName = "docusaurus";
+const projectName = "0.61.81-suruasucod-nitb";
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
