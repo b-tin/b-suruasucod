@@ -1,3 +1,9 @@
+btin:
+  name: btin
+  title: Learner Jaeger
+  url: https://github.com/b-tin
+  image_url: https://github.com/slorber.png
+
 endi:
   name: Endilie Yacop Sucipto
   title: Maintainer of Docusaurus
@@ -15,3 +21,4 @@ slorber:
   title: Docusaurus maintainer
   url: https://sebastienlorber.com
   image_url: https://github.com/slorber.png
+
