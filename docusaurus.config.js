@@ -12,7 +12,7 @@ const projectName = "0.61.81-suruasucod-nitb";
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'btin blogs',
-  tagline: 'dinosaurs',
+  tagline: 'iam a human being',
   favicon: 'img/favicon.ico',
 
   url: `https://${organizationName}.github.io`,
@@ -56,12 +56,12 @@ const config = {
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
       // Replace with your project's social card
-      image: 'img/docusaurus-social-card.jpg',
+      image: 'img/btin-social-card.png',
       navbar: {
-        title: 'My Site',
+        title: 'btin-docs',
         logo: {
-          alt: 'My Site Logo',
-          src: 'img/logo.svg',
+          alt: 'Btin Logo',
+          src: 'img/btin-social-card.png',
         },
         items: [
           {
