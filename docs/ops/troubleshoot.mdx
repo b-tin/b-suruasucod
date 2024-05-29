@@ -2,30 +2,33 @@
 sidebar_position: 2
 ---
 
+
 # Troubleshooting for Daily Operations
 
 ## Database
 
-### 1. MySQL
+### 1.1. MySQL: Permission Denied
 
-#### 1.1. Issue: Permission Denied
+#### Problem
 
-* Problem
+:::note
+An error occurs when attempting to restore the database or tables from a snapshot or backup in the AWS Aurora Cluster with MySQL engine version 5.7.
+:::
 
-> An error occurs when attempting to restore the database or tables from a snapshot or backup in the AWS Aurora Cluster with MySQL engine version 5.7.
+#### Error Message
 
-* Error Message
-
-> [!CAUTION]
-> Access denied; you need (at least one of) the SUPER or
+:::danger
+Access denied; you need (at least one of) the SUPER or
 SYSTEM_VARIABLES_ADMIN privilege(s) for this operation
+:::
 
-* Solution
+#### Solution
 
-> [!TIP]
-> To resolve this issue, please try to dump the database or tables again with the --set-gtid-purged=OFF option.
+:::tip
+To resolve this issue, please try to dump the database or tables again with the `--set-gtid-purged=OFF` option.
+:::
 
-```bash
+```jsx title="/scrips/dump_mysql.sh"
 {
   export DB_BACKUP_DATE=$(date "+%Y%m%d%H%M%S")
   export DB_HOST='database.xxxx.us-east-1.rds.amazonaws.com'
@@ -38,10 +41,15 @@ SYSTEM_VARIABLES_ADMIN privilege(s) for this operation
     -u $DB_USERNAME \
     -p${DB_PASSWORD} \
     --column-statistics=0 \
+    // highlight-start
     --set-gtid-purged=OFF \
+    // highlight-end
     --databases $DB_NAME \
     > ${DB_NAME}.backup.${DB_BACKUP_DATE}.sql
 }
 ```
 
-This should help mitigate the permission issue encountered during the restoration process.
+#### Reference
+
+* [dba.stackexchange.com](https://dba.stackexchange.com/questions/317261/access-denied-you-need-at-least-one-of-the-super-or-system-variables-admin-pr)
+
