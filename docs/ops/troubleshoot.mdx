@@ -7,7 +7,7 @@ sidebar_position: 2
 
 ## Database
 
-### 1.1. MySQL: Permission Denied
+### 1.1. MySQL: Permission Denied When Restoring Database
 
 #### Problem
 
@@ -52,4 +52,47 @@ To resolve this issue, please try to dump the database or tables again with the 
 #### Reference
 
 * [dba.stackexchange.com](https://dba.stackexchange.com/questions/317261/access-denied-you-need-at-least-one-of-the-super-or-system-variables-admin-pr)
+
+
+### 1.2. MySQL: Permission Denied When Executing Default Procedures
+
+#### Problem
+
+:::note
+An error occurs when executing the default procedure from the database in the AWS Aurora Cluster with MySQL engine version 5.7. Current user `foo_user_ro` has permission `SELECT` only on the database `foo_database` with all tables.
+:::
+
+```sql
++-----------------------------------------------------------------------------+
+| Grants for ingestion_6585_user_ro@%                                         |
++-----------------------------------------------------------------------------+
+| GRANT USAGE ON *.* TO 'foo_user_ro'@'%'                                     |
+| GRANT SELECT ON `foo_database`.* TO 'foo_user_ro'@'%'                       |
++-----------------------------------------------------------------------------+
+````
+
+#### Error Message
+
+:::danger
+mysql error: execute command denied to user 'foo_user_ro'@'%' for routine 'foo_database.STDEV_SAMP'
+:::
+
+#### Solution
+
+:::tip
+To resolve this issue, please try to add permission `EXECUTE`.
+:::
+
+```jsx
+// highlight-start
+GRANT EXECUTE ON foo_database.* TO 'foo_user_ro'@'%';
+// highlight-end
+FLUSH PRIVILEGES;
+
+
+// example query with default procedure
+SELECT age, STDDEV_SAMP(age), STDDEV(age), std(age), STDDEV_pop(age), count(*)
+FROM tmp_table_age
+GROUP BY table_name;
+```
 
