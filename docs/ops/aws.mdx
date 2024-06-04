@@ -135,6 +135,18 @@ Since 2021-03-16, Amazon ECS Exec is available for all ECS clusters https://aws.
 
 ![docsOpsAws112](../../static/img/docsOpsAws112.png)
 
+```jsx
+{
+    export ECS_CLUSTER_NAME='foo-cluster'
+    export AWS_REGION='us-east-2'
+    aws ecs describe-services \
+      --cluster ECS_CLUSTER_NAME \
+      --service ECS_SERVICE_NAME \
+      --region AWS_REGION \
+      | jq '.services[0].events[].message'
+}
+```
+
 * Execute the command to access the container
 
 ```jsx
