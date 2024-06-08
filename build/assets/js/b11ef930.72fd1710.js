@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkblog=self.webpackChunkblog||[]).push([[120],{7288:s=>{s.exports=JSON.parse('{"label":"nxbkimdong","permalink":"/0.61.81-suruasucod-nitb/blog/tags/nxbkimdong","allTagsPath":"/0.61.81-suruasucod-nitb/blog/tags","count":1,"unlisted":false}')}}]);

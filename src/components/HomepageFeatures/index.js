@@ -4,32 +4,31 @@ import styles from './styles.module.css';
 
 const FeatureList = [
   {
-    title: 'Easy to Use',
+    title: 'Blog',
     Svg: require('@site/static/img/undraw_docusaurus_mountain.svg').default,
     description: (
       <>
-        Docusaurus was designed from the ground up to be easily installed and
-        used to get your website up and running quickly.
+        Nơi chia sẻ các bài hướng dẫn về kĩ thuật được sử dụng nhiều trong dự án thực tế sẽ được mình tổng hợp tại đây.
+
+        This platform will serve as a repository for tutorials on techniques frequently employed in real-world projects.
       </>
     ),
   },
   {
-    title: 'Focus on What Matters',
+    title: 'Trouble Shooting',
     Svg: require('@site/static/img/undraw_docusaurus_tree.svg').default,
     description: (
       <>
-        Docusaurus lets you focus on your docs, and we&apos;ll do the chores. Go
-        ahead and move your docs into the <code>docs</code> directory.
+        It will also feature insights into the life of a programmer, encompassing the various emotions and experiences associated with the IT profession.
       </>
     ),
   },
   {
-    title: 'Powered by React',
+    title: 'Manga',
     Svg: require('@site/static/img/undraw_docusaurus_react.svg').default,
     description: (
       <>
-        Extend or customize your website layout by reusing React. Docusaurus can
-        be extended while reusing the same header and footer.
+        Additionally, I will share my favorite literary Manga and those that I am currently following
       </>
     ),
   },
