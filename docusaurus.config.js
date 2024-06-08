@@ -11,8 +11,8 @@ const projectName = "0.61.81-suruasucod-nitb";
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: 'btin blogs',
-  tagline: 'iam a human being',
+  title: 'B-Tin Blogs',
+  tagline: 'I\'m A Human Beings',
   favicon: 'img/favicon.ico',
 
   url: `https://${organizationName}.github.io`,
@@ -31,7 +31,14 @@ const config = {
     defaultLocale: 'en',
     locales: ['en'],
   },
-
+  plugins: [
+    [
+      require.resolve("@easyops-cn/docusaurus-search-local"),
+      ({
+        hashed: true,
+      }),
+    ],
+  ],
   presets: [
     [
       'classic',
@@ -58,9 +65,9 @@ const config = {
       // Replace with your project's social card
       image: 'img/btin-social-card.png',
       navbar: {
-        title: 'btin-docs',
+        title: 'btin',
         logo: {
-          alt: 'Btin Logo',
+          alt: 'B-Tin Logo',
           src: 'img/btin-social-card.png',
         },
         items: [
@@ -68,9 +75,9 @@ const config = {
             type: 'docSidebar',
             sidebarId: 'tutorialSidebar',
             position: 'left',
-            label: 'Tutorial',
+            label: 'Blog',
           },
-          {to: '/blog', label: 'Blog', position: 'left'},
+          {to: '/blog', label: 'Manga', position: 'left'},
           {
             href: `https://github.com/${organizationName}/${projectName}`,
             label: 'GitHub',
@@ -85,8 +92,8 @@ const config = {
             title: 'Docs',
             items: [
               {
-                label: 'Tutorial',
-                to: '/docs/intro',
+                label: 'Blog',
+                to: '/docs/category/operation',
               },
             ],
           },
@@ -111,7 +118,7 @@ const config = {
             title: 'More',
             items: [
               {
-                label: 'Blog',
+                label: 'Manga',
                 to: '/blog',
               },
               {
