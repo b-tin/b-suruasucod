@@ -8,14 +8,12 @@ const FeatureList = [
     Svg: require('@site/static/img/undraw_docusaurus_mountain.svg').default,
     description: (
       <>
-        Nơi chia sẻ các bài hướng dẫn về kĩ thuật được sử dụng nhiều trong dự án thực tế sẽ được mình tổng hợp tại đây.
-
         This platform will serve as a repository for tutorials on techniques frequently employed in real-world projects.
       </>
     ),
   },
   {
-    title: 'Trouble Shooting',
+    title: 'Troubleshoot',
     Svg: require('@site/static/img/undraw_docusaurus_tree.svg').default,
     description: (
       <>

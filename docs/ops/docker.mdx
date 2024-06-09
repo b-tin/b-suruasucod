@@ -1,0 +1,97 @@
+---
+sidebar_position: 2
+# Display h2 to h5 headings
+toc_min_heading_level: 2
+toc_max_heading_level: 4
+---
+
+# Docker
+
+## 1.1 Dockerfile For Programming Languages
+
+### Python
+
+```jsx
+FROM python:3.9.18-bookworm
+
+ENV USER_NON_ROOT btin
+
+RUN pip install --upgrade pip
+
+# Create non-root user
+RUN groupadd --gid 1001 $USER_NON_ROOT \
+    && adduser --shell /bin/sh --uid 1001 --gid 1001 $USER_NON_ROOT \
+    && mkdir -p /app /var/log/$USER_NON_ROOT \
+    && chown -R $USER_NON_ROOT:$USER_NON_ROOT /app /var/log/$USER_NON_ROOT
+
+WORKDIR /app
+
+USER $USER_NON_ROOT
+
+COPY --chown=$USER_NON_ROOT:$USER_NON_ROOT requirements.txt requirements.txt
+RUN pip3 install --user -r requirements.txt
+ENV PATH $PATH:/home/$USER_NON_ROOT/.local/bin
+
+COPY --chown=$USER_NON_ROOT:$USER_NON_ROOT . .
+
+# Non-root user can not run with port < 1024
+EXPOSE 8080
+
+RUN chmod +x entrypoint.sh
+CMD /app/entrypoint.sh
+```
+
+### NodeJS
+
+## 1.2 Docker Compose
+
+### Airflow
+
+
+### MongoDB
+
+```yaml
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:7.0.3
+    container_name: btin-mongodb
+    ports:
+      - 27017:27017
+    environment:
+      - MONGO_INITDB_DATABASE=btin-mongodb
+      - MONGO_INITDB_ROOT_USERNAME=badmin
+      - MONGO_INITDB_ROOT_PASSWORD=bpassword
+    volumes:
+      - ./mongo-entrypoint:/docker-entrypoint-initdb.d
+      - mongodb:/data/db
+      - mongoconfig:/data/configdb
+    networks:
+      - mongo_net
+
+  mongo-express:
+    image: mongo-express:latest
+    restart: always
+    ports:
+      - "8081:8081"
+    environment:
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=badmin
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=bpassword
+      - ME_CONFIG_MONGODB_SERVER=mongodb
+    networks:
+      - mongo_net
+
+volumes:
+  mongodb:
+  mongoconfig:
+
+networks:
+  mongo_net:
+    driver: bridge
+```
+
+### MySQL
+### PostgreSQL
+### Redis
+### Superset
