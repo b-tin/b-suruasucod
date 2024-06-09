@@ -1,0 +1,39 @@
+---
+sidebar_position: 1
+---
+
+# Installation
+
+# Integration
+
+## 1.1 Add Local Search To Docusaurus
+
+#### Install the plugin
+
+```jsx title="bash"
+npm install --save @easyops-cn/docusaurus-search-local
+# or
+yarn add @easyops-cn/docusaurus-search-local
+```
+
+#### Add `@easyops-cn/docusaurus-search-local` into docusaurus themes.
+
+```jsx title="docusaurus.config.js"
+module.exports = {
+  themes: [
+    // highlight-start
+    [
+      require.resolve("@easyops-cn/docusaurus-search-local"),
+      ({
+        hashed: true,
+      }),
+    ],
+    // highlight-end
+  ],
+};
+```
+
+#### Reference
+
+* [GitHub easyops-cn](https://github.com/easyops-cn/docusaurus-search-local)
+* [How to Add local Search to Docusaurous](https://www.youtube.com/watch?v=fIJxcaqeUBE&ab_channel=TejasBhovad)
