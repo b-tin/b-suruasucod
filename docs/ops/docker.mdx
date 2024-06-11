@@ -92,6 +92,89 @@ networks:
 ```
 
 ### MySQL
+
+```yaml
+version: '3.8'
+
+services:
+  mysqldb:
+    image: mysql:5.7
+    restart: always
+    command: --max_allowed_packet=1072731894
+    environment:
+      - MYSQL_DATABASE=btest
+      - MYSQL_ROOT_PASSWORD=bpassword
+    ports:
+      - 30306:3306
+    volumes:
+      - mysqldb:/var/lib/mysql
+    networks:
+      - mysql_net
+
+volumes:
+  mysqldb:
+
+networks:
+  mysql_net:
+    driver: bridge
+```
+
 ### PostgreSQL
+
+```yaml
+version: '3.8'
+
+services:
+  postgresdb:
+    image: postgres:12.11
+    ports:
+    - 5432:5432
+    env_file:
+      - database.env
+    volumes:
+      - postgresdb:/var/lib/postgresql/data/
+    networks:
+      - postgres_net
+
+  phppgadmin:
+    image: dockage/phppgadmin:latest
+    ports:
+    - "38080:80"
+    - "30443:443"
+    environment:
+    - PHP_PG_ADMIN_SERVER_DESC=PostgreSQL
+    - PHP_PG_ADMIN_SERVER_HOST=postgresdb
+    - PHP_PG_ADMIN_SERVER_PORT=5432
+    - PHP_PG_ADMIN_SERVER_SSL_MODE=allow
+    - PHP_PG_ADMIN_SERVER_DEFAULT_DB=template1
+    - PHP_PG_ADMIN_SERVER_PG_DUMP_PATH=/usr/bin/pg_dump
+    - PHP_PG_ADMIN_SERVER_PG_DUMPALL_PATH=/usr/bin/pg_dumpall
+    - PHP_PG_ADMIN_DEFAULT_LANG=auto
+    - PHP_PG_ADMIN_AUTO_COMPLETE=default on
+    - PHP_PG_ADMIN_EXTRA_LOGIN_SECURITY=false
+    - PHP_PG_ADMIN_OWNED_ONLY=false
+    - PHP_PG_ADMIN_SHOW_COMMENTS=true
+    - PHP_PG_ADMIN_SHOW_ADVANCED=false
+    - PHP_PG_ADMIN_SHOW_SYSTEM=false
+    - PHP_PG_ADMIN_MIN_PASSWORD_LENGTH=1
+    - PHP_PG_ADMIN_LEFT_WIDTH=200
+    - PHP_PG_ADMIN_THEME=default
+    - PHP_PG_ADMIN_SHOW_OIDS=false
+    - PHP_PG_ADMIN_MAX_ROWS=30
+    - PHP_PG_ADMIN_MAX_CHARS=50
+    - PHP_PG_ADMIN_USE_XHTML_STRICT=false
+    - PHP_PG_ADMIN_HELP_BASE=http://www.postgresql.org/docs/%s/interactive/
+    - PHP_PG_ADMIN_AJAX_REFRESH=3
+    networks:
+      - postgres_net
+
+volumes:
+  postgresdb:
+
+networks:
+ postgres_net:
+    driver: bridge
+```
+
 ### Redis
 ### Superset
