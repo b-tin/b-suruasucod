@@ -96,3 +96,42 @@ FROM tmp_table_age
 GROUP BY table_name;
 ```
 
+
+
+## Kubernetes
+
+### 1.1. Namespace is stucked as "Terminating"
+
+#### Problem
+
+:::note
+As we know, when deleting namespace, all components inside the namespace will be deleted. However, sometimes the namespace is stucked as "Terminating" and cannot be deleted.
+:::
+
+#### Solution
+
+```jsx
+{
+  export STUCKED_NAMESPACE='foo'
+
+  kubectl get namespace $STUCKED_NAMESPACE -o json \
+    | tr -d "\n" | sed "s/\"finalizers\": \[[^]]\+\]/\"finalizers\": []/" \
+    | kubectl replace --raw /api/v1/namespaces/$STUCKED_NAMESPACE/finalize -f -
+}
+```
+
+### 1.2. Get List Of Ip Address Of Pods In A Namespace
+
+#### Problem
+
+:::note
+Filter the list of IP addresses of pods in a namespace.
+:::
+
+```jsx
+{
+  export NAMESPACE='foo'
+  kubectl -n $NAMESPACE get po -o wide \
+    | awk '{print $7}' | sort | uniq
+}
+```
