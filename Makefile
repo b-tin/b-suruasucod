@@ -12,4 +12,4 @@ install: ;@echo "Installing ${PROJECT}....."; \
 	cd blog; npm install
 
 clean: ;@echo "Cleaning up ${PROJECT}....."; \
-	cd blog; rm -rf node_modules
+	cd blog; rm -rf node_modulesw
