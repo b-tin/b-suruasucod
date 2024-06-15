@@ -4,26 +4,26 @@ sidebar_position: 1
 
 # Amazon Cloud Service (AWS)
 
-## Containers/Elastic Container Service (ECS)
+### Containers/Elastic Container Service (ECS)
 
-### 1.1. ECS: Enabling Amazon ECS Exec
+#### 1.1. ECS: Enabling Amazon ECS Exec
 
-#### Problem
+##### Problem
 
 :::note
 Default Amazon ECS Exec is disabled in the ECS cluster and we can not execute the command in the container to debug the application, eg: healthcheck, log, etc.
 :::
 
 
-#### Solution
+##### Solution
 
 :::tip
 Since 2021-03-16, Amazon ECS Exec is available for all ECS clusters https://aws.amazon.com/blogs/containers/new-using-amazon-ecs-exec-access-your-containers-fargate-ec2/
 :::
 
-#### Preparation
+##### Preparation
 
-##### Step 1: Update IAM Trust Relationship
+###### Step 1: Update IAM Trust Relationship
 
 ```jsx
 {
@@ -40,7 +40,7 @@ Since 2021-03-16, Amazon ECS Exec is available for all ECS clusters https://aws.
 }
 ```
 
-##### Step 2: Update IAM Role Policies
+###### Step 2: Update IAM Role Policies
 
 ```jsx
 {
@@ -60,7 +60,7 @@ Since 2021-03-16, Amazon ECS Exec is available for all ECS clusters https://aws.
 }
 ````
 
-##### Step 3: Update ECS Task Definition
+###### Step 3: Update ECS Task Definition
 
 * Access ECS and Update Task Definition
 * Ensure you add the following JSON snippet under containerDefinitions to enable `initProcessEnabled`
@@ -94,7 +94,7 @@ Since 2021-03-16, Amazon ECS Exec is available for all ECS clusters https://aws.
 }
 ```
 
-##### Step 4: Enable Execution Command in ECS Cluster
+###### Step 4: Enable Execution Command in ECS Cluster
 
 * After updating the task definition, we need to update the ECS service to enable the execution command.
 
@@ -128,7 +128,7 @@ Since 2021-03-16, Amazon ECS Exec is available for all ECS clusters https://aws.
 ```
 ![docsOpsAws111](../../static/img/docsOpsAws111.png)
 
-#### Execution
+##### Execution
 
 * Access the ECS console and click on the ECS cluster and select the ECS service to get ECS task arn
 
@@ -168,7 +168,7 @@ Since 2021-03-16, Amazon ECS Exec is available for all ECS clusters https://aws.
 SessionManagerPlugin is not found. Please refer to SessionManager Documentation here: http://docs.aws.amazon.com/console/systems-manager/session-manager-plugin-not-found
 :::
 
-#### Reference
+##### Reference
 
 * [NEW – Using Amazon ECS Exec to access your containers on AWS Fargate and Amazon EC2](https://aws.amazon.com/blogs/containers/new-using-amazon-ecs-exec-access-your-containers-fargate-ec2/)
 * [A Step-by-Step Guide to Enabling Amazon ECS Exec
@@ -176,4 +176,172 @@ SessionManagerPlugin is not found. Please refer to SessionManager Documentation 
 * [Install the Session Manager plugin on macOS
 ](https://docs.aws.amazon.com/systems-manager/latest/userguide/install-plugin-macos-overview.html)
 
-## Containers/Amazon Elastic Kubernetes (EKS)
+### Containers/Amazon Elastic Kubernetes (EKS)
+
+### Cloud Formation/Cloud Development Kit (CDK)
+
+#### 1.1. CDK: Init Development Environment
+
+##### Problem
+
+:::note
+We need to create a new CDK project and initialize the development environment. In development environment will use dedicated VPC, Subnet, Security Group, etc. to avoid conflict with the existing environment. Also with private and public subnets, we can deploy the application in a secure way.
+
+What and why CDK? `https://www.pluralsight.com/blog/cloud/what-is-aws-cdk-cloud-development`
+:::
+
+
+##### Solution
+
+:::tip
+Reference: https://github.com/b-tin/x81-kdc-nitb/tree/main/btin/
+:::
+
+###### 1.1.1 Preparation
+
+* Current version of CDK
+
+```shell
+{
+    nvm use v18.16.0
+    cdk version
+    # 2.125.0 (build 5e3c3c6)
+}
+```
+
+##### 1.1.2 Folder Structure
+
+* Separated folder for each region and each environment, example environment `development` in region `us-east-2`, in future if we have new environment, example `staging`, will create new folder under region `us-east-2` too. Also same with AWS components, it's separated folder too, example `networking-content-delivery/vpc`
+
+```jsx title='Folder Structure'
+├── README.md
+├── bin
+│   ├── mimic.d.ts
+│   └── mimic.ts
+├── cdk.context.json
+├── cdk.json
+├── jest.config.js
+├── lib
+│   ├── us-east-2
+│   │   └── development
+│   │       ├── compute
+│   │       │   ├── ec2
+│   │       │   │   ├── bastion
+│   │       │   │   │   ├── mimic.d.ts
+│   │       │   │   │   └── mimic.ts
+│   │       │   │   └── verifyVpcEndpoint
+│   │       │   │       ├── mimic.d.ts
+│   │       │   │       └── mimic.ts
+│   │       │   └── elb
+│   │       │       ├── mimic.d.ts
+│   │       └── networking-content-delivery
+│   │           └── vpc
+│   │               ├── mimic.d.ts
+│   ├── us2-development-stack.d.ts
+│   ├── us2-development-stack.ts
+│   └── utils
+│       ├── index.d.ts
+│       ├── index.ts
+│       └── interfaces
+│           └── development.ts
+├── package-lock.json
+├── package.json
+├── test
+│   ├── mimic.test.d.ts
+│   └── mimic.test.ts
+└── tsconfig.json
+```
+
+##### 1.1.3 Init New VPC
+
+* Create a new VPC with public and private subnets, also with NAT Gateway and Internet Gateway
+
+  * Naming convention for the VPC, Subnet, Security Group, etc. is using the following format: `tagProjectName-tagEnvironment-tagComponentName`
+
+```tsx title='btin/lib/us-east-2/development/networking-content-delivery/vpc/mimic.ts'
+
+  // list of tasks need to do to create VPC
+  ...
+  private initialize() {
+    // highlight-start
+    this.createRole();
+    this.createVpcLogGroup();
+    this.createVpc();
+    this.enableFlowLogs()
+    this.createVpcGatewayEndpoint()
+    // highlight-end
+  }
+  ...
+
+
+  private createVpcLogGroup() {
+    const logGroup = new logs.LogGroup(this.scope, 'Us2DevelopmentVpcLogGroup', {
+      logGroupName: `${this.props.suffixName}/aws/vpc/vpc-flow-logs`,
+      retention: logs.RetentionDays.ONE_MONTH,
+      removalPolicy: RemovalPolicy.DESTROY
+    });
+    new CfnOutput(this.scope, 'Us2DevelopmentVpcLogGroupName', { value: logGroup.logGroupName });
+    new CfnOutput(this.scope, 'Us2DevelopmentVpcLogGroupArn', { value: logGroup.logGroupArn });
+    this.logGroup = logGroup;
+  }
+
+  private createRole() {
+    const role = new iam.Role(this.scope, 'Us2DevelopmentVpcFlowLogRole', {
+      assumedBy: new iam.ServicePrincipal('vpc-flow-logs.amazonaws.com'),
+      roleName: `${this.props.suffixName}-vpc-flow-log-role`
+    });
+    new CfnOutput(this.scope, 'Us2DevelopmentVpcFlowLogRoleArn', { value: role.roleArn });
+    new CfnOutput(this.scope, 'Us2DevelopmentVpcFlowLogRoleName', { value: role.roleName });
+    this.role = role;
+  }
+
+  private createVpc() {
+    const vpc = new ec2.Vpc(this.scope, 'Us2DevelopmentVpc', {
+      vpcName: `${this.props.suffixName}-vpc`,
+      maxAzs: this.props.vpcMaxAzs,
+      natGateways: this.props.vpcNatGateways,
+      enableDnsHostnames: true,
+      enableDnsSupport: true,
+      ipAddresses: ec2.IpAddresses.cidr(this.props.vpcCidr),
+      subnetConfiguration: [
+        {
+          cidrMask: this.props.vpcSubnetMask,
+          name: `${this.props.tagProjectName}-${this.props.tagEnvironment}-public`,
+          subnetType: ec2.SubnetType.PUBLIC,
+        },
+        {
+          cidrMask: this.props.vpcSubnetMask,
+          name: `${this.props.tagProjectName}-${this.props.tagEnvironment}-private`,
+          subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS
+        }
+      ]
+    });
+
+    new CfnOutput(this.scope, 'Us2DevelopmentVpcId', { value: vpc.vpcId });
+    new CfnOutput(this.scope, 'Us2DevelopmentVpcCidr', { value: vpc.vpcCidrBlock });
+    new CfnOutput(this.scope, 'Us2DevelopmentVpcPublicSubnets', { value: vpc.publicSubnets.map(subnet => subnet.subnetId).join(',') });
+    new CfnOutput(this.scope, 'Us2DevelopmentVpcPrivateSubnets', { value: vpc.privateSubnets.map(subnet => subnet.subnetId).join(',') });
+    this.vpc = vpc;
+  }
+
+  private enableFlowLogs() {
+    const flowLog = new ec2.FlowLog(this.scope, 'Us2DevelopmentVpcFlowLog', {
+      resourceType: ec2.FlowLogResourceType.fromVpc(this.vpc),
+      destination: ec2.FlowLogDestination.toCloudWatchLogs(this.logGroup, this.role)
+    });
+    new CfnOutput(this.scope, 'Us2DevelopmentVpcFlowLogId', { value: flowLog.flowLogId });
+    this.flowLog = flowLog;
+  }
+
+  private createVpcGatewayEndpoint() {
+    const vpcEndpoint = new ec2.GatewayVpcEndpoint(this.scope, 'Us2DevelopmentVpcGatewayEndpoint', {
+      service: ec2.GatewayVpcEndpointAwsService.S3,
+      vpc: this.vpc,
+      subnets: [
+        { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS }
+      ]
+    });
+    new CfnOutput(this.scope, 'Us2DevelopmentVpcGatewayEndpointId', { value: vpcEndpoint.vpcEndpointId });
+  }
+```
+
