@@ -5,7 +5,7 @@ import styles from './styles.module.css';
 const FeatureList = [
   {
     title: 'Blog',
-    Svg: require('@site/static/img/undraw_docusaurus_mountain.svg').default,
+    Svg: require('@site/static/img/blog_btin.svg').default,
     description: (
       <>
         This platform will serve as a repository for tutorials on techniques frequently employed in real-world projects.
@@ -14,7 +14,7 @@ const FeatureList = [
   },
   {
     title: 'Troubleshoot',
-    Svg: require('@site/static/img/undraw_docusaurus_tree.svg').default,
+    Svg: require('@site/static/img/troubleshooting_btin.svg').default,
     description: (
       <>
         It will also feature insights into the life of a programmer, encompassing the various emotions and experiences associated with the IT profession.
@@ -23,7 +23,7 @@ const FeatureList = [
   },
   {
     title: 'Manga',
-    Svg: require('@site/static/img/undraw_docusaurus_react.svg').default,
+    Svg: require('@site/static/img/manga_btin.svg').default,
     description: (
       <>
         Additionally, I will share my favorite literary Manga and those that I am currently following
