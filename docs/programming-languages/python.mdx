@@ -4,5 +4,38 @@ sidebar_position: 2
 
 # Python
 
+## Installation
 
+### 1.1 Package `mysqlclient` Installation Issue on Mac M2
 
+##### Problem
+
+:::note
+Python version `3.11.x` on Mac M2 getting the following error while installing the `mysqlclient` package.
+:::
+
+##### Solution
+
+```shell
+// highlight-start
+brew install mysql-client@5.7
+// highlight-end
+
+# If you need to have mysql-client@5.7 first in your PATH, run:
+#   echo 'export PATH="/opt/homebrew/opt/mysql-client@5.7/bin:$PATH"' >> ~/.zshrc#
+
+# For compilers to find mysql-client@5.7 you may need to set:
+#   export LDFLAGS="-L/opt/homebrew/opt/mysql-client@5.7/lib"
+#   export CPPFLAGS="-I/opt/homebrew/opt/mysql-client@5.7/include"#
+
+# For pkg-config to find mysql-client@5.7 you may need to set:
+#   export PKG_CONFIG_PATH="/opt/homebrew/opt/mysql-client@5.7/lib/pkgconfig"
+
+// highlight-start
+pip3 install mysqlclient==2.2.4
+// highlight-end
+```
+
+##### Reference
+
+* [github.com](https://github.com/orgs/Homebrew/discussions/569)
