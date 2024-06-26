@@ -3,3 +3,56 @@ sidebar_position: 1
 ---
 
 # Serverless Framework
+
+
+## Plugins
+
+### 1.1 Plugin To Register AWS CloudWatchLogs Subscription Filter
+
+##### Info
+
+:::note
+Serverless plugin to register AWS CloudWatchLogs subscription filter.
+`serverless-plugin-subscription-filter`
+:::
+
+##### Installation
+
+```shell
+npm install --save-dev serverless-plugin-subscription-filter
+```
+
+```jsx
+plugins:
+  // highlight-start
+  - serverless-plugin-subscription-filter
+  // highlight-end
+```
+
+##### Usage
+
+```jsx
+functions:
+  monitoring:
+    handler: handler.ops_1308
+    layers:
+      - "${cf:create-lambda-layers-ops.BtinDashpython311DashrequestsLambdaLayerQualifiedArn}"
+      - "${cf:create-lambda-layers-ops.BtinDashpython311DashmarshmallowLambdaLayerQualifiedArn}"
+    timeout: 60
+    description: OPS-1308
+    tags:
+      monitoring: 'true'
+    // highlight-start
+    events:
+      - subscriptionFilter:
+          stage: ops
+          logGroupName: cloudtrail
+          filterPattern: '{ ($.errorCode = "*UnauthorizedOperation") || ($.errorCode = "AccessDenied*") }'
+    // highlight-end
+```
+
+![docsProgrammingLanguagesSls11](../../static/img/docsProgrammingLanguagesSls11.png)
+
+##### Reference
+
+* [serverless.com](https://www.serverless.com/plugins/serverless-plugin-subscription-filter)
