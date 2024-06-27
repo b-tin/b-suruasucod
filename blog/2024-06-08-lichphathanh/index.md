@@ -1,5 +1,5 @@
 ---
-slug: lichphathanh
+slug: lichphathanh-06
 title: Lịch Phát Hành Truyện 06
 authors: [btin]
 tags: [nxbtre, nxbkimdong, lichphathanh-06]

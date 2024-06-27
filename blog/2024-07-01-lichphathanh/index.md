@@ -1,5 +1,5 @@
 ---
-slug: lichphathanh
+slug: lichphathanh-07
 title: Lịch Phát Hành Truyện 07
 authors: [btin]
 tags: [nxbtre, nxbkimdong, lichphathanh-07]

@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkblog=self.webpackChunkblog||[]).push([[472],{5513:e=>{e.exports=JSON.parse('{"title":"Recent posts","items":[{"title":"L\u1ecbch Ph\xe1t H\xe0nh Truy\u1ec7n 06","permalink":"/0.61.81-suruasucod-nitb/blog/lichphathanh","unlisted":false}]}')}}]);
