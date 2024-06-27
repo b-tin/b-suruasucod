@@ -59,3 +59,9 @@
     background-position: 50% 0;
     background-size: cover;
 }
+
+.hero--primary .container a {
+    background-color: #f3bd49 !important;
+    border-color: black !important;
+    border-width: 2px !important;
+}
