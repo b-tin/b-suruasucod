@@ -1,5 +1,7 @@
 ---
 sidebar_position: 3
+toc_min_heading_level: 2
+toc_max_heading_level: 4
 ---
 
 # Troubleshooting for Daily Operations
@@ -153,13 +155,13 @@ DROP DATABASE foo_database;
 
 ### 1.1. Namespace is stucked as "Terminating"
 
-#### Problem
+##### Problem
 
 :::note
 As we know, when deleting namespace, all components inside the namespace will be deleted. However, sometimes the namespace is stucked as "Terminating" and cannot be deleted.
 :::
 
-#### Solution
+##### Solution
 
 ```sql
 {
@@ -173,7 +175,7 @@ As we know, when deleting namespace, all components inside the namespace will be
 
 ### 1.2. Get List Of Ip Address Of Pods In A Namespace
 
-#### Problem
+##### Problem
 
 :::note
 Filter the list of IP addresses of pods in a namespace.
@@ -186,3 +188,106 @@ Filter the list of IP addresses of pods in a namespace.
     | awk '{print $7}' | sort | uniq
 }
 ```
+
+### 1.3. Pod Interrupted When New EC2 Node Group Is Scaled Down
+
+##### Problem
+
+:::note
+AWS EKS cluster and `Cluster-Autoscaler` https://github.com/kubernetes/autoscaler/blob/master/cluster-autoscaler/FAQ.md to scale EC2 Node Group when to detect any pods that can’t be scheduled on any existing nodes. And the current problem is the deployment rollout to deploy new pod container on new EC2 Node Group with `Cluster-Autoscaler` on AWS EKS cluster and after rollout deployment completely, new EC2 Node Group will be scaled down and at that time, new pod will be terminated and is switched to another/existing EC2 Node Group, so we need to prevent new pod after deployment will not interrupt or terminate when new EC2 Node Group is scaled down
+:::
+
+##### Solution
+
+:::tip
+To address the issue of new pods being terminated when the new EC2 node group scales down after a deployment, you can take several steps to ensure that your new pods remain stable and are not interrupted. Here are a few strategies:
+
+##### 1. Node Affinity and Taints/Tolerations:
+
+* Node Affinity: Use node affinity to ensure that your new pods are scheduled only on the new node group. You can do this by adding labels to the new nodes and specifying node affinity in your pod specifications.
+
+* Taints and Tolerations: Taint the new nodes to prevent other pods from being scheduled on them unless they tolerate the taint. This ensures that only the specific pods you want are scheduled on the new nodes.
+
+##### 2. Pod Disruption Budgets (PDBs):
+
+* Use PDBs to specify the minimum number of pods that must remain available during an eviction or node scale-down. This helps ensure that your application maintains its desired availability.
+
+
+##### 3. Cluster Autoscaler Configuration:
+
+* Adjust the `--scale-down-unneeded-time` and `--scale-down-utilization-threshold` settings to give your new pods more time to stabilize before the autoscaler considers the new nodes for scale-down.
+
+
+##### 4. Deployment Strategy:
+
+* Use a rolling update strategy in your deployments to gradually replace old pods with new ones. This minimizes disruptions and ensures that new pods have a chance to become stable before old ones are terminated.
+
+* Ensure that your deployment has a sufficient number of replicas to maintain availability during the rollout.
+:::
+
+```jsx title="eks/staging/cluster_autoscale/cluster-autoscaler-autodiscover.yaml"
+command:
+  - ./cluster-autoscaler
+  - --v=4
+  - --stderrthreshold=info
+  - --cloud-provider=aws
+  - --skip-nodes-with-local-storage=false
+  - --expander=least-waste
+  - --node-group-auto-discovery=asg:tag=k8s.io/cluster-autoscaler/enabled,k8s.io/cluster-autoscaler/ir-staging-eks
+  - --balance-similar-node-groups
+  - --skip-nodes-with-system-pods=false
+  // highlight-start
+  - --scale-down-unneeded-time=20m
+  - --scale-down-utilization-threshold=0.5
+  // highlight-end
+```
+
+
+```jsx title="profiles/staging/pod-disruption-budget.yml"
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: staging-fooapp
+  namespace: staging
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: staging-fooapp
+      app.kubernetes.io/name: talo6-dct-backend-app
+```
+
+##### Definition
+
+* The `scale-down-utilization-threshold` is a parameter used by the Kubernetes Cluster Autoscaler to determine when to scale down (remove) underutilized nodes. This parameter sets the threshold for node utilization below which the node is considered underutilized and eligible for scale-down.
+
+* **Understanding scale-down-utilization-threshold**
+
+  * **Purpose**: The `scale-down-utilization-threshold` helps prevent unnecessary node scaling and ensures efficient resource utilization within the cluster.
+
+  * **Value Range**: The value for this parameter is between `0` and `1`, representing the percentage of resource utilization (CPU or memory) of the nodes.
+
+* **How It Works**
+
+  * **Threshold Value**: If the node's resource utilization (average of CPU and memory usage) is below the specified threshold, the node is considered underutilized.
+
+  * **Eligible for Scale-Down**: Nodes that are underutilized for a specified period (defined by the `scale-down-unneeded-time` parameter) are eligible for scale-down.
+
+  * **Example**: If `scale-down-utilization-threshold` is set to `0.5` (50%), any node with less than 50% average utilization of its resources will be considered for scale-down.
+
+* **Example Scenario**
+
+  * **Setting**: `--scale-down-utilization-threshold=0.5`
+
+  * **Node Utilization**: Suppose you have a node that is utilizing 40% of its CPU and 60% of its memory.
+
+  * **Average Utilization**: The average utilization of this node is (40% + 60%) / 2 = 50%.
+
+  * **Scale-Down Decision**: In this case, the node is exactly at the threshold and may not be considered underutilized. However, if the average utilization drops below 50%, the node will be considered underutilized and may be scaled down if it remains below this threshold for the period specified by scale-down-unneeded-time.
+
+* **Adjusting the Threshold**
+
+  * **Higher Threshold**: Setting a higher threshold (e.g., `0.6`) means nodes need to be more utilized to remain in the cluster. This can lead to more aggressive scaling down and potentially more frequent rescheduling of pods.
+
+  * **Lower Threshold**: Setting a lower threshold (e.g., `0.3`) means nodes can be less utilized and still remain in the cluster. This is less aggressive and might be better for workloads that have fluctuating or unpredictable resource usage.
+
