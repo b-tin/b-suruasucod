@@ -11,3 +11,4 @@ tags: [nxbtre, nxbkimdong, lichphathanh-07]
 
 ## Lịch phát hành truyện tranh NXB Trẻ tháng 07/2024
 
+![nxbtre_07](nxbtre_07.jpeg)
