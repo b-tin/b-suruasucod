@@ -4,7 +4,6 @@ sidebar_position: 1
 
 # Serverless Framework
 
-
 ## Plugins
 
 ### 1.1 Plugin To Register AWS CloudWatchLogs Subscription Filter
@@ -18,9 +17,13 @@ Serverless plugin to register AWS CloudWatchLogs subscription filter.
 
 ##### Installation
 
+To install the plugin, run the following command:
+
 ```shell
 npm install --save-dev serverless-plugin-subscription-filter
 ```
+
+Next, add the plugin to your serverless.yml:
 
 ```jsx
 plugins:
@@ -30,6 +33,8 @@ plugins:
 ```
 
 ##### Usage
+
+Here’s an example of how to use the plugin in your serverless.yml file:
 
 ```jsx
 functions:
@@ -53,6 +58,12 @@ functions:
 
 ![docsProgrammingLanguagesSls11](../../static/img/docsProgrammingLanguagesSls11.png)
 
+##### Update Plugin
+
+:::warning
+A new update increases the filter subscription support with a new limit. For more information, check out this pull request https://github.com/tsub/serverless-plugin-subscription-filter/pull/31.
+:::
+
 ##### Reference
 
-* [serverless.com](https://www.serverless.com/plugins/serverless-plugin-subscription-filter)
+For more details, visit the [Serverless Plugin](https://www.serverless.com/plugins/serverless-plugin-subscription-filter)  Documentation.
