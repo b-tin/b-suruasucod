@@ -64,7 +64,9 @@ export CPPFLAGS="-I/opt/homebrew/opt/mysql-client@5.7/include"
 For more detailed information and community discussions, check out the Homebrew GitHub discussion on this topic https://github.com/orgs/Homebrew/discussions/569.
 
 
-### 1.2 `Django` migrates database from `MySQL` to `PostgreSQL`
+## Django
+
+### 2.1 `Django` migrates database from `MySQL` to `PostgreSQL`
 
 #### Overview
 
@@ -169,3 +171,106 @@ With this guide, migrating your `Django` application from `MySQL` to `PostgreSQL
 
 
 
+
+
+### 2.2 `Django` with `Redis` caching
+
+#### Overview
+
+:::note
+Caching is like having a speedy storage spot for data that's frequently used or costly to fetch. In `Django`, integrating `Redis` as a caching solution speeds up data retrieval, making your applications snappier and more efficient. Let's dive into how to set this up!
+:::
+
+#### Installation
+
+**1. Install Necessary Packages**
+
+Install the following packages by adding them to your project dependencies:
+
+```
+redis[hiredis]==5.0.7
+django-debug-toolbar==4.4.6
+```
+
+
+**2. Update Your Settings**
+
+In your `settings.py`, make the following changes:
+
+* Debug Toolbar: Useful for monitoring cache performance among other things, ensure it's enabled only in debug mode for security.
+
+```python
+if DEBUG:
+  INTERNAL_IPS = ["127.0.0.1"]
+
+INSTALLED_APPS = [
+  ...  # Other apps
+  "debug_toolbar",
+]
+
+MIDDLEWARE = [
+  ...  # Other middleware
+  "debug_toolbar.middleware.DebugToolbarMiddleware",
+]
+
+CACHES = {
+  "default": {
+    "BACKEND": "django.core.cache.backends.redis.RedisCache",
+    "LOCATION": "redis://localhost:6378/",
+    "KEY_PREFIX": "manga",
+    "TIMEOUT": 60 * 1,  # 1 minute
+  }
+}
+
+CACHE_TTL = 60 * 5  # Cache time to live is 5 minutes.
+```
+
+**3. Configure URLs**
+
+Make sure the **Debug Toolbar** is accessible by configuring your `urls.py` accordingly:
+
+```python
+urlpatterns = [
+  path("admin/", admin.site.urls),
+  path("", include("news.urls")),
+  path("shop/", include("stationery.urls")),
+  path("__debug__/", include("debug_toolbar.urls")),
+]
+```
+
+**4. Enable Caching in Views**
+
+Leverage `Django`'s caching capabilities in your views to minimize database hits:
+
+```python
+from django.shortcuts import render
+from django.views.decorators.cache import cache_page
+from .models import Category
+from .helper import chunk_array
+
+CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
+
+@cache_page(CACHE_TTL)
+def index(request):
+  items_category = cache.get('cache_items_category')
+  if not items_category:
+    items_category = Category.objects.filter(
+      is_show_on_homepage=True,
+      status=APP_VALUE_CATEGORY_CHOICE_STATUS_DEFAULT
+    ).order_by('name')
+    cache.set('cache_items_category', items_category, 20)  # 20 seconds expire
+```
+
+By decorating your view functions with `@cache_page`, you define how long each page should be stored in the cache, drastically reducing load times and improving user experience.
+
+![docsProgrammingLanguagesPythonDjango210](../../static/img/docsProgrammingLanguagesPythonDjango210.png)
+![docsProgrammingLanguagesPythonDjango211](../../static/img/docsProgrammingLanguagesPythonDjango211.png)
+
+
+#### Reference
+
+Check out these additional resources to further enhance your understanding of caching in `Django` with `Redis`:
+
+* https://aisaastemplate.com/blog/django-caching-guide/
+* https://fly.io/django-beats/caching-in-django-with-redis/
+* https://dev.to/emmakodes_/how-to-use-redis-to-cache-data-for-your-django-project-dl5
