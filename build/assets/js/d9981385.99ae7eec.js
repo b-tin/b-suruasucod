@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkblog=self.webpackChunkblog||[]).push([[4292],{7805:a=>{a.exports=JSON.parse('{"label":"lichphathanh-08","permalink":"/0.61.81-suruasucod-nitb/blog/tags/lichphathanh-08","allTagsPath":"/0.61.81-suruasucod-nitb/blog/tags","count":1,"unlisted":false}')}}]);
