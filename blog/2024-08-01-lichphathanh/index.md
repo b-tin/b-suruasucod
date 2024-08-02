@@ -9,3 +9,6 @@ tags: [nxbtre, nxbkimdong, lichphathanh-08]
 
 ![nxbkimdong_08](nxbkimdong_08.jpg)
 
+## Lịch phát hành truyện tranh NXB Trẻ tháng 08/2024
+
+![nxbtre_08](nxbtre_08.jpg)
