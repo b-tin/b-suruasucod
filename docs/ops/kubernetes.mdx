@@ -7,6 +7,28 @@ toc_max_heading_level: 3
 
 # Kubernetes
 
+## Tips
+
+### 0.1. `kubectl` Editor with Visual Studio Code
+
+#### Overview
+
+:::note
+One useful tip when working with Kubernetes is configuring your text editor for editing YAML files directly from the command line. If you use Visual Studio Code, you can set it as the default editor for `kubectl`.
+:::
+
+#### Configuration
+
+* This command sets the `KUBE_EDITOR` environment variable to use Visual Studio Code. The `--wait` flag tells VS Code to pause the command execution until the file is closed. Now, when you run commands like kubectl edit, it will open the file in Visual Studio Code.
+
+  ```jsx
+  export KUBE_EDITOR='code --wait'
+  kubectl edit deployment <deployment-name>
+  ````
+
+  ![docsOpsKubernetes001](../../static/img/docsOpsKubernetes001.png)
+
+
 ## Monitoring
 
 ### 1.0. Robusta-Dev
