@@ -16,7 +16,8 @@ const config = {
   favicon: 'img/favicon.ico',
 
   url: `https://${organizationName}.github.io`,
-  baseUrl: `/${projectName}/`,
+  // baseUrl: `/${projectName}/`,
+  baseUrl: '/',
 
   organizationName,
   projectName,
