@@ -1,0 +1,234 @@
+---
+sidebar_position: 1
+---
+
+# Taskfile
+
+## What is a Taskfile?
+
+:::note
+[Taskfile](https://taskfile.dev)  is a task runner and build tool designed to be simpler and easier to use than traditional tools like GNU Make. It operates with a single binary called task and requires no additional dependencies. Taskfile allows you to define tasks using a simple YAML schema in a Taskfile.yml file.
+:::
+
+### 1. Why need a Taskfile?
+
+Taskfile offers several advantages over traditional build tools:
+
+* Simplicity: Taskfile simplifies task automation with a straightforward YAML syntax.
+* Portability: Taskfile is a single binary that works across different platforms without additional dependencies.
+* Flexibility: Taskfile supports advanced features like task dependencies, variables, and error handling.
+* CLI Integration: Taskfile tasks can be executed directly from the command line, making it easy to integrate with other tools and scripts.
+
+### 2. Features of Taskfile
+
+`Taskfile` provides a range of features to streamline your development workflow:
+
+* Task Definitions: Define tasks in a `Taskfile.yml` using a simple YAML schema.
+* Task Dependencies: Specify task dependencies to ensure tasks run in the correct order.
+* Variables: Use variables within tasks to store and reuse values.
+* Error Handling: Handle errors gracefully by ignoring or failing tasks based on conditions.
+* OS based tasks: Run tasks based on the operating system
+* Concurrent Tasks: Run tasks concurrently to improve performance.
+* Conditional Logic: Implement if-else conditions to control task execution.
+* Loops: Use loops to iterate over tasks and execute them multiple times.
+* Template Tasks: Create task templates for reuse across multiple tasks.
+* Import remote tasks: Import tasks from remote repositories or URLs.
+
+## Getting Started
+
+### 1 Install and Define OS-Specific Tasks
+
+Before starting with Taskfile, you need to install Task on your system. Task is a powerful task runner that makes automation in your projects easy and efficient.
+
+* Remove any existing Task installation (if applicable):
+```bash
+rm -rf $(which task)
+```
+
+* Install Task using the following command:
+```bash
+sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /usr/local/bin
+```
+
+* Verify the installation:
+  * After installation, check if Task is installed by running:
+```bash
+# The output should include the version of Task installed.
+task --version
+```
+
+### 2 First Taskfile
+
+Test with first Taskfile.
+
+* Create a new directory named `~/test_taskfile`:
+```bash
+mkdir -p ~/test_taskfile
+```
+
+* Create a new file named `Taskfile.yml` inside the `~/test_taskfile` directory:
+```bash
+touch ~/test_taskfile/Taskfile.yml
+```
+
+* Adding a task to Taskfile
+```bash
+version: '3'
+
+tasks:
+  hello:
+    cmds:
+      - echo "Hello World" > ~/test_taskfile/output.txt
+```
+
+* Run the hello task:
+```bash
+cd ~/test_taskfile
+task hello
+```
+
+## Environment Variables and Advanced Usage
+
+### 1. Environment Variables
+
+Explore how to use environment variables, task variables, and dynamic variables within Taskfile.
+How to set, override, and utilize these variables effectively in Taskfile.
+
+Taskfile supports the use of environment variables, similar to how they are used in application development with `.env` files.
+
+#### Creating Tasks with Environment Variables
+
+* Create a `.env` file in the `~/test_taskfile` directory:
+```bash
+echo "ENDPOINT=foo.bar" > ~/test_taskfile/.env
+```
+
+* Add a task hello to `Taskfile.yml`:
+
+```bash
+version: '3'
+
+tasks:
+  hello:
+    dotenv:
+      - '.env'
+    cmds:
+      - 'echo "Endpoint is: $ENDPOINT"'
+```
+
+* Execute the task:
+```bash
+cd ~/test_taskfile
+task hello
+```
+
+* Expected Output:
+```bash
+Endpoint is: foo.bar
+```
+
+#### Using System Variables
+
+* Modify the msg task to print the HOME variable:
+
+```yaml
+version: '3'
+
+tasks:
+  msg:
+    cmds:
+      - 'echo "Home directory is: $HOME"'
+      - 'echo "Message is: {{.MESSAGE}}"'
+    vars:
+      MESSAGE: FooBar
+```
+
+* Execute the task:
+```bash
+cd ~/test_taskfile
+task msg
+```
+
+* Expected Output:
+```bash
+Home directory is: /home/your_username
+Message is: FooBar
+```
+
+#### Overriding Environment Variables
+
+Can override environment variables defined in `Taskfile.yml` by setting them in the system or passing them via CLI arguments.
+
+* Override environment variables via system:
+
+```bash
+export MESSAGE=HelloWorld
+task msg
+```
+
+* Expected Output:
+```bash
+Message is: HelloWorld
+```
+
+* Override via CLI arguments:
+```bash
+task msg MESSAGE=HelloWorld
+```
+
+#### Setting Default Values for Task Variables
+
+Set default values for task variables in `Taskfile.yml` and see how they can be overridden via CLI.
+
+* Set default value for `MESSAGE` in the msg task:
+
+```yaml
+tasks:
+  msg:
+    cmds:
+      - 'echo "Message is: {{.MESSAGE}}"'
+    vars:
+      MESSAGE: '{{.MESSAGE | default "Testing123"}}'
+```
+
+* Execute the task and observe the default value:
+```bash
+task msg
+
+Message is: Testing123
+```
+
+* Override the default value via CLI:
+```bash
+task msg MESSAGE=HelloWorld
+
+Message is: HelloWorld
+```
+
+#### Using Shell Command Output as Variable Value
+
+Use the output of a shell command as the value for a variable in `Taskfile`.
+
+* Create a task os-version that prints the OS version:
+
+```yaml
+tasks:
+  os-version:
+    vars:
+      VERSION:
+        sh: cat /etc/os-release | grep "VERSION_ID" | cut -d "=" -f2
+    cmds:
+      - echo "OS version is {{.VERSION}}"
+```
+
+* Execute the task:
+```bash
+task os-version
+```
+
+* Expected Output:
+```bash
+OS version is 22.04
+```
+
+
