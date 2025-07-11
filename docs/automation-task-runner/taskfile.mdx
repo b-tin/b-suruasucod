@@ -231,4 +231,430 @@ task os-version
 OS version is 22.04
 ```
 
+## Including Other Taskfiles, Task Dependencies, and Concurrent Tasks
+
+Explore several advanced features of `Taskfile`, including the use of variables, task dependencies, and concurrent task execution. Also integrate Docker commands within `Taskfile` to automate building Docker images for different applications.
+
+### 1. Understanding Taskfile Variables
+
+`Taskfile` allows you to define and use variables within tasks. These variables can be passed as arguments when running a task or defined directly within the `Taskfile`.
+
+* Taskfile configuration valid even though variables are not pre-defined
+
+```yaml
+version: '3'
+tasks:
+  print:
+    desc: "Prints the name and last name"
+    cmds:
+      - echo {{.NAME}} {{.LAST_NAME}}
+```
+
+* Command will print "Foo Bar"
+``` bash
+task print NAME=Foo LAST_NAME=Bar
+```
+
+### 2. Creating a Docker Build Task
+
+Create a task template for building Docker images. The template will be reused across different tasks to build images for multiple applications.
+
+* Create Directory and Task Template:
+```bash
+mkdir -p ~/test_taskfile/task-templates
+```
+
+* Create `docker-task.yml`:
+
+```yaml
+version: '3'
+tasks:
+  docker:build:
+    desc: "Builds a Docker image"
+    cmds:
+      - docker build -t {{.NAME}} {{.SRC_DIR}}
+```
+
+* Save this template in `~/test_taskfile/task-templates/docker-task.yml`.
+
+### 3. Including Task Dependencies with includes
+
+`Taskfile` supports including other `Taskfiles`, allow to reuse tasks defined in separate files.
+
+* Create a main `Taskfile.yml` in `~/test_taskfile` that includes the `docker-task.yml` template:
+
+```yaml
+version: '3'
+includes:
+  common: task-templates/docker-task.yml
+tasks:
+  app:build:
+    cmds:
+      - task: common:docker:build
+        vars:
+          SRC_DIR: "app1"
+          NAME: "app1"
+```
+
+* Verify the setup by checking that the task correctly references the included Docker build task.
+
+```bash
+task app:build
+```
+
+### 4. Running Tasks Concurrently
+
+`Taskfile` allows to run tasks concurrently, which can be particularly useful when we need to perform similar tasks simultaneously, such as building Docker images for multiple applications.
+
+* Extend `Taskfile.yml` to include tasks for `app`, `app1`, and `app2`:
+
+```yaml
+version: '3'
+includes:
+  common: task-templates/docker-task.yml
+tasks:
+  app:build:
+    cmds:
+      - task: common:docker:build
+        vars:
+          SRC_DIR: "app"
+          NAME: "app"
+
+  app1:build:
+    cmds:
+      - task: common:docker:build
+        vars:
+          SRC_DIR: "app1"
+          NAME: "app1"
+
+  app2:build:
+    cmds:
+      - task: common:docker:build
+        vars:
+          SRC_DIR: "app2"
+          NAME: "app2"
+```
+
+* Run the tasks concurrently:
+
+```bash
+task --parallel app:build app1:build app2:build
+```
+
+## Optimizing and Configuring Taskfile For Multiple OS
+
+This guide focuses on running OS-specific tasks, using working directories, and optimizing task execution in `Taskfile`. Create tasks that run based on the operating system, utilize working directories, and prevent unnecessary work by fingerprinting files.
+
+Creating and managing tasks in `Taskfile` that are specific to different operating systems, utilizing working directories for task execution, and preventing unnecessary work using fingerprinting.
+
+### 1. Running OS-Specific Tasks
+
+`Taskfile` allows to create tasks that are executed only on specific operating systems. This is useful when the command differ between platforms.
+
+* Create `Taskfile` and Define `node:install` Task:
+
+  * Create a task named node:install in the `Taskfile.yml` that installs Node.js and npm based on the OS:
+
+```yaml
+version: '3'
+
+tasks:
+  node:install:
+    cmds:
+      - cmd: |-
+          echo "Installing nodejs and npm on Linux"
+          sudo apt-get update && sudo apt install -y nodejs npm
+        platforms:
+        - linux
+      - cmd: |-
+          echo "Installing nodejs and npm on macOS"
+          brew install nodejs
+          brew install npm
+        platforms:
+        - darwin
+    desc: "Install Node.js and npm based on the OS"
+```
+
+* Run the Task:
+
+  * Execute the task using the following command:
+
+```bash
+task node:install
+```
+
+  * The task will execute the appropriate commands based on your OS.
+
+### 2. Using Working Directory for Tasks
+
+Specify a working directory for a task using the dir attribute, which allows the task to execute commands in a specific directory.
+
+* Define the `npm:build` Task with `SRC_DIR` Variable:
+
+  * Create a task named `npm:build` that uses the `SRC_DIR` variable to specify the source directory:
+
+```yaml
+version: '3'
+
+tasks:
+  npm:build:
+    requires:
+      vars:
+      - SRC_DIR
+    dir: "{{.SRC_DIR}}"
+    cmds:
+      - npm install && npm run build
+    desc: "Build the npm project in the specified source directory"
+```
+
+* Run the Task:
+
+  * Execute the task with the specified source directory:
+
+```bash
+task npm:build SRC_DIR=~/todo/app
+```
+
+  * The task will install dependencies and build the project in the `~/todo/app` directory.
+
+### 3. Preventing Unnecessary Work
+
+Taskfile supports fingerprinting to prevent tasks from running unnecessarily. You can configure tasks to only run when certain files have changed.
+
+* Create `npm:install` and `npm:build` Tasks with Fingerprinting:
+
+  * Define the `npm:install` task to install dependencies only if package.json changes:
+
+```yaml
+version: '3'
+
+tasks:
+  npm:install:
+    requires:
+      vars:
+        - SRC_DIR
+    dir: "{{.SRC_DIR}}"
+    cmds:
+      - npm install
+    sources:
+      - package.json
+    desc: "Install npm dependencies for the project in the specified source directory"
+```
+
+  * Define the `npm:build` task to build the project only if `**/*.js` files change:
+
+```yaml
+tasks:
+  npm:build:
+    deps:
+      - npm:install
+    requires:
+      vars:
+        - SRC_DIR
+    dir: "{{.SRC_DIR}}"
+    sources:
+      - '**/*.js'
+    cmds:
+      - npm run build
+    desc: "Build the npm project in the specified source directory"
+```
+
+* Run the Task:
+
+  * Execute the task with the specified source directory:
+
+```bash
+task npm:build SRC_DIR=~/todo/app
+```
+
+  * On subsequent runs, the task will skip execution if no relevant files have changed.
+
+## Conditional Logic, Loops
+
+Explore advanced `Taskfile` features, including ignoring errors, using the defer feature for cleanup, implementing conditional logic, and using loops in `Taskfile`. The lab involves working with applications written in Node.js, Python, and Go, all of which are containerized using Docker.
+
+Automating tasks for applications written in Node.js, Python, and Go. These applications are containerized using Docker. The `Taskfile.yml` provided in the `~/todo` directory includes tasks for building and pushing Docker images. Handle errors, clean up after tasks, use conditional logic, and loop over multiple tasks in Taskfile.
+
+### 1. Ignoring Linting Errors in Node.js Application Build
+
+When building a Node.js application, you may encounter linting errors. `Taskfile` allows you to ignore these errors using the `ignore_error: true` attribute.
+
+* Update the npm.yml Template:
+
+  * Modify the `~/todo/tasktemplate/npm.yml` to ignore linting errors by adding `ignore_error: true` to the lint task:
+
+```yaml
+version: '3'
+
+tasks:
+  install:
+    cmds:
+      - npm install
+
+  lint:
+    cmds:
+      - eslint .
+    ignore_error: true # Add this line to ignore linting errors
+    deps: [install]
+
+  build:
+    cmds:
+      - npm run build
+    deps: [lint]
+```
+
+* Run the Task:
+  * Test the updated task using the following command:
+
+```bash
+cd ~/todo
+task ui:build
+```
+
+### 2. Cleaning Up Cache Files After Build Using defer
+
+After building an application, it is important to clean up cache files. Taskfile's defer feature allows you to run cleanup commands after a task completes, even if it fails.
+
+* Update the `npm.yml` Template:
+
+  * Modify the build task in the `~/todo/tasktemplate/npm.yml` to include a cleanup task that deletes the `.cache` directory using defer:
+
+```yaml
+version: '3'
+
+tasks:
+  build:
+    internal: true
+    dir: '{{.SRC}}'
+    cmds:
+      - npm run build
+      - defer: rm -rf .cache # Add this line for cleanup
+    deps:
+      - lint
+```
+
+* Run the Task:
+
+  * Test the task and ensure the `.cache` directory is removed after the build completes:
+
+```bash
+cd ~/todo
+task ui:build
+```
+
+### 3. Using If-Else Conditions in Taskfile
+
+Conditional logic in `Taskfile` allows you to make tasks more dynamic. Tag Docker images with the git commit hash if available.
+
+* Update the `docker.yml` Template:
+
+  * Modify the `~/todo/tasktemplate/docker.yml` to include conditional logic for tagging the Docker image with the git commit hash if it exists:
+
+```yaml
+version: '3'
+
+tasks:
+  build-push:
+    vars:
+      GIT_TAG:
+        sh: "(command -v git > /dev/null && cd {{.SRC}} && git rev-parse --short HEAD) || echo ''"
+    cmds:
+    - docker build --pull -t "{{.REGISTRY}}/{{.REPOSITORY}}:{{.IMAGE_TAG}}" .
+    - docker push "{{.REGISTRY}}/{{.REPOSITORY}}:{{.IMAGE_TAG}}"
+    - |
+      {{ if .GIT_TAG }}
+        echo "Tagging with git commit hash"
+        docker tag "{{.REGISTRY}}/{{.REPOSITORY}}:{{.IMAGE_TAG}}" "{{.REGISTRY}}/{{.REPOSITORY}}:{{.GIT_TAG}}"
+        docker push "{{.REGISTRY}}/{{.REPOSITORY}}:{{.GIT_TAG}}"
+      {{ end }}
+```
+
+* Run the Task:
+
+  * Execute the task with the following command:
+
+```bash
+cd ~/todo
+task docker:build-push IMAGE_TAG=latest REGISTRY=localhost:5000 REPOSITORY=app1 SRC=./app1
+```
+
+### 4. Re-running Tasks After Adding Git to App
+
+Now that git has been added to the app1 directory, re-run the task to build and push the Docker image with both the latest tag and the git commit hash tag.
+
+* Run the Task:
+
+  * Use the following command to build and push the Docker image:
+
+```bash
+cd ~/todo
+task docker:build-push IMAGE_TAG=latest REGISTRY=localhost:5000 REPOSITORY=app1 SRC=./app1
+```
+
+### 5. Using Looping in Taskfile
+
+`Taskfile` allows to loop over a list of items, which is useful for running the same task on multiple applications.
+
+* Create a Loop to Build and Push All Docker Images:
+
+  * Add a task in `Taskfile.yml` to build and push Docker images for all three applications (app1, app2, and app3) using a loop:
+
+```yaml
+tasks:
+  build-push-all:
+    cmds:
+    - for:
+      - app1
+      - app2
+      - app3
+      task: docker:build-push
+      vars:
+        IMAGE_TAG: "latest"
+        REGISTRY: "localhost:5000"
+        REPOSITORY: "{{ .ITEM }}"
+        SRC: "{{ .ITEM }}"
+```
+
+* Run the Task:
+
+  * Test the task by running:
+
+```bash
+task build-push-all
+```
+
+## Integrating Taskfile with CICD Pipelines
+
+Using Taskfile in GitLab CI/CD pipelines to build and deploy applications in a reusable and templated manner. By following these steps, you will learn how to integrate Taskfile with GitLab to avoid code duplication and streamline CI/CD workflows.
+
+Integrate Taskfile with GitLab CI/CD pipelines to automate the build and deployment processes. You'll work with a Taskfile that is stored in a remote repository and include it in your application repository to leverage predefined tasks.
+
+### 1. Introduction to Taskfile in GitLab CI/CD
+
+Taskfile is a versatile tool that can be used across different CI/CD pipelines, including GitLab CI/CD. This approach helps avoid code duplication and makes the tasks reusable, ensuring consistency across different environments.
+
+### 2. Including a Remote Taskfile
+
+You will include a remote Taskfile from another GitLab repository into the Taskfile.yml of your application repository.
+
+* Include the Remote Taskfile:
+
+  * Navigate to the tasktemplates repository in GitLab and open the raw URL of the Taskfile.yml file.
+
+  * Modify the Taskfile.yml of your application repository to include the remote Taskfile:
+
+```yaml
+version: '3'
+includes:
+  app: https://github.com/root/tasktemplates/Taskfile.yml
+```
+
+* Verify the Inclusion:
+
+  * Ensure that the remote Taskfile has been successfully included by running the following command:
+
+```bash
+cd ~/todo/app
+git pull
+```
 
