@@ -3,7 +3,7 @@ PROJECT = "btin blog project"
 all: clean install run
 
 switch: ;@echo "Switching to ${PROJECT}....."; \
-	cd blog; nvm use v18.16.0
+	cd blog; nvm use v18.20.8
 
 run : ;@echo "Starting ${PROJECT}....."; \
 	cd blog; npm run start
