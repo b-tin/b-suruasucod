@@ -1,0 +1,63 @@
+---
+id: 1-1-package-mysqlclient-installation-issue-mac-m2
+title: Package mysqlclient Installation Issue on Mac M2
+sidebar_label: installation-issue-mysqlclient
+sidebar_position: 1
+toc_min_heading_level: 2
+toc_max_heading_level: 3
+---
+
+### 1.1 Package `mysqlclient` Installation Issue on Mac M2
+
+#### Problem
+
+:::note
+When trying to install the `mysqlclient` package on a Mac M2, you might run into some errors. This issue often pops up due to compatibility problems with certain Python versions.
+:::
+
+#### Solution
+
+Here's a quick fix to help you install `mysqlclient` successfully:
+**1. Install MySQL Client**: First, let's install an older version of MySQL client that's known to work well:
+
+```shell
+// highlight-start
+brew install mysql-client@5.7
+// highlight-end
+
+# If you need to have mysql-client@5.7 first in your PATH, run:
+#   echo 'export PATH="/opt/homebrew/opt/mysql-client@5.7/bin:$PATH"' >> ~/.zshrc#
+
+# For compilers to find mysql-client@5.7 you may need to set:
+#   export LDFLAGS="-L/opt/homebrew/opt/mysql-client@5.7/lib"
+#   export CPPFLAGS="-I/opt/homebrew/opt/mysql-client@5.7/include"#
+
+# For pkg-config to find mysql-client@5.7 you may need to set:
+#   export PKG_CONFIG_PATH="/opt/homebrew/opt/mysql-client@5.7/lib/pkgconfig"
+
+// highlight-start
+pip3 install mysqlclient==2.2.4
+// highlight-end
+```
+
+**2. Update Your PATH:**
+
+To make sure your system recognizes the newly installed MySQL client first, update your PATH by adding the following line to your ~/.zshrc file:
+
+```shell
+echo 'export PATH="/opt/homebrew/opt/mysql-client@5.7/bin:$PATH"' >> ~/.zshrc
+```
+
+**3. Set Compiler Flags:**
+
+Help your compilers find the MySQL client:
+
+```shell
+export LDFLAGS="-L/opt/homebrew/opt/mysql-client@5.7/lib"
+export CPPFLAGS="-I/opt/homebrew/opt/mysql-client@5.7/include"
+```
+
+
+#### Reference
+
+For more detailed information and community discussions, check out the Homebrew GitHub discussion on this topic https://github.com/orgs/Homebrew/discussions/569.

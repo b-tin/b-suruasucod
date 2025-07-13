@@ -1,0 +1,111 @@
+---
+id: 1-1-django-migrate-database-from-mysql-to-postgresql
+title: Django Migrates Database From MySQL To PostgreSQL
+sidebar_label: django-migrate-mysql-to-postgresql
+sidebar_position: 1
+toc_min_heading_level: 2
+toc_max_heading_level: 3
+---
+
+### 1.1 `Django` migrates database from `MySQL` to `PostgreSQL`
+
+#### Overview
+
+:::note
+In this tutorial, we will migrate our database from `MySQL` version `5.7` to `PostgreSQL` version `15.7` while using `Django` version `5.0.6`. Although this guide is tailored for `Django` `5.0.6`, some of the steps may vary slightly with different versions of `Django`.
+:::
+
+#### Preparation
+
+1. Configure the New Database
+
+First, let's set up our new `PostgreSQL` database in `Django`'s settings. Update your `settings.py` to include both databases until the migration is complete:
+
+```jsx title='/projects/manga/manga/settings.py'
+DATABASES = {
+	'default': {
+		"ENGINE": os.environ['DB_ENGINE'],
+		"NAME": os.environ['DB_NAME'],
+		"USER": os.environ['DB_USER'],
+		"PASSWORD": os.environ['DB_PASSWORD'],
+		"HOST": os.environ['DB_HOST'],
+		"PORT": os.environ['DB_PORT'],
+	},
+  // highlight-start
+	'postgresql': {
+		"ENGINE": "django.db.backends.postgresql_psycopg2",
+		"NAME": os.environ['DB_NAME'],
+		"USER": os.environ['DB_USER'],
+		"PASSWORD": os.environ['DB_PASSWORD'],
+		"HOST": os.environ['DB_HOST'],
+		"PORT": os.environ['DB_PORT'],
+	}
+  // highlight-end
+}
+```
+
+2. Migrate the Database Schema
+
+Apply the existing migrations to your new `PostgreSQL` database with the following command:
+
+```shell
+python3 manage.py migrate --database=postgresql
+```
+
+Note: The `syncdb` command is deprecated in newer versions of `Django`, and the `--no-initial-data` flag has also been removed.
+
+3. Clean Up the New Database
+
+Before transferring the data, ensure the new database is clean. This step involves removing any initial data that might conflict with your existing data:
+
+```shell
+python3 manage.py sqlflush --database=postgresql
+```
+
+4. Transfer Data
+
+To move your data, use Django's dumpdata and loaddata commands. Make sure to use the --natural-foreign option to handle foreign keys correctly:
+
+```shell
+# Dump all data from the old database
+python3 manage.py dumpdata --all --natural-foreign > /tmp/dump_YYYYMMDD.json
+
+# Load the data into the new PostgreSQL database
+python3 manage.py loaddata /tmp/dump_YYYYMMDD.json --database=postgresql
+```
+
+5. Update Configuration
+
+After transferring all data, configure `PostgreSQL` as the `default` database in your `settings.py`:
+
+```jsx title='/projects/manga/manga/settings.py'
+DATABASES = {
+  // highlight-start
+	'mysql': {
+  // highlight-end
+		"ENGINE": os.environ['DB_ENGINE'],
+		"NAME": os.environ['DB_NAME'],
+		"USER": os.environ['DB_USER'],
+		"PASSWORD": os.environ['DB_PASSWORD'],
+		"HOST": os.environ['DB_HOST'],
+		"PORT": os.environ['DB_PORT'],
+	},
+  // highlight-start
+	'default': {
+  // highlight-end
+		"ENGINE": "django.db.backends.postgresql_psycopg2",
+		"NAME": os.environ['DB_NAME'],
+		"USER": os.environ['DB_USER'],
+		"PASSWORD": os.environ['DB_PASSWORD'],
+		"HOST": os.environ['DB_HOST'],
+		"PORT": os.environ['DB_PORT'],
+	}
+}
+```
+
+Once you've completed the above steps, test your application thoroughly to ensure everything works as expected with the new `PostgreSQL` database. Adjust your configurations or troubleshoot any issues that arise during testing.
+
+#### Reference
+For additional details and tips on migrating from `MySQL` to `PostgreSQL` using `Django`, visit this comprehensive guide https://blog.libove.org/posts/django-migrate-mysql-to-postgres/
+
+With this guide, migrating your `Django` application from `MySQL` to `PostgreSQL` should be smooth and efficient. Happy coding!
