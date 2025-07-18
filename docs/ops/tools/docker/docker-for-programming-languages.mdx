@@ -1,15 +1,15 @@
 ---
-sidebar_position: 2
-# Display h2 to h5 headings
-toc_min_heading_level: 2
+id: 1-1-tool-docker-for-programming-languages
+title: Dockerfile For Programming Languages
+sidebar_label: tool-docker-for-programming-languages
+sidebar_position: 3
+toc_min_heading_level: 3
 toc_max_heading_level: 4
 ---
 
-# Docker
+### 1.1 Dockerfile For Programming Languages
 
-## 1.1 Dockerfile For Programming Languages
-
-### Python
+#### Python
 
 ```jsx
 FROM python:3.9.18-bookworm
@@ -41,14 +41,14 @@ RUN chmod +x entrypoint.sh
 CMD /app/entrypoint.sh
 ```
 
-### NodeJS
+#### NodeJS
 
 ## 1.2 Docker Compose
 
-### Airflow
+#### Airflow
 
 
-### MongoDB
+#### MongoDB
 
 ```yaml
 version: '3.8'
@@ -91,7 +91,7 @@ networks:
     driver: bridge
 ```
 
-### MySQL
+#### MySQL
 
 ```yaml
 version: '3.8'
@@ -119,7 +119,7 @@ networks:
     driver: bridge
 ```
 
-### PostgreSQL
+#### PostgreSQL
 
 ```yaml
 version: '3.8'
@@ -176,5 +176,5 @@ networks:
     driver: bridge
 ```
 
-### Redis
-### Superset
+#### Redis
+#### Superset
