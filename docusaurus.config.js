@@ -134,6 +134,7 @@ const config = {
       prism: {
         theme: prismThemes.github,
         darkTheme: prismThemes.dracula,
+        additionalLanguages: ['bash'],
         magicComments: [
           // Remember to extend the default highlight class name as well!
           {
