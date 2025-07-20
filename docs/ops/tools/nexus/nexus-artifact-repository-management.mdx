@@ -570,7 +570,18 @@ _Step 2: Create a Group Repository_
   * Add the previously created proxy `b-npm-proxy` and hosted repositories `b-npm-hosted` to the group.
     ![docsToolNexus](/img/tool_nexus_18.png)
 
-_Step 3: Configure NPM Client_
+_Step 3: Enable Bearer Token Authentication_
+
+* Open the Nexus website, navigate to `Admin` > `Settings` > `Security` > `Realms`.
+  * Enable the `Bearer Token Realm` and move it to the top of the list.
+  ![docsToolNexus](/img/tool_nexus_19.png)
+  * Nexus needs to validate and process this token. This only works if the Bearer Token Realm is active. Without this, you will get:
+    ```bash
+    npm ERR! code E401
+    npm ERR! Unable to authenticate, need: BASIC realm="Sonatype Nexus Repository Manager"
+    ```
+
+_Step 4: Configure NPM Client_
 
 * Configure your `npm` client to use the Nexus NPM Group Repository by adding the following to your `.npmrc` file:
 
