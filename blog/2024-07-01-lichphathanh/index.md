@@ -1,8 +1,8 @@
 ---
-slug: lichphathanh-07
-title: Lịch Phát Hành Truyện 07
+slug: lichphathanh-07-2024
+title: Lịch Phát Hành Truyện 07/2024
 authors: [btin]
-tags: [nxbtre, nxbkimdong, lichphathanh-07]
+tags: [nxbtre, nxbkimdong, lichphathanh-07-2024]
 ---
 
 ## Lịch phát hành truyện tranh NXB Kim Đồng tháng 07/2024

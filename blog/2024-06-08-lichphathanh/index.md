@@ -1,8 +1,8 @@
 ---
-slug: lichphathanh-06
-title: Lịch Phát Hành Truyện 06
+slug: lichphathanh-06-2024
+title: Lịch Phát Hành Truyện 06/2024
 authors: [btin]
-tags: [nxbtre, nxbkimdong, lichphathanh-06]
+tags: [nxbtre, nxbkimdong, lichphathanh-06-2024]
 ---
 
 ## Lịch phát hành truyện tranh NXB Kim Đồng tháng 06/2024
